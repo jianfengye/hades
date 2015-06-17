@@ -1,0 +1,25 @@
+{
+    "name": "hades/framework",
+    "description": "The Hades Framework.",
+    "keywords": ["framework", "hades"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yejianfeng",
+            "email": "jianfengye110@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "ext-pdo": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hades\\": "src/Hades/"
+        }
+    },
+    "minimum-stability": "dev"
+}
