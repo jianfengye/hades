@@ -12,10 +12,11 @@ class Request
     protected $server;
     // generate from $_COOKIE
     protected $cookie;
-    // request uri
-    protected $uri;
     // request header
     protected $header;
+
+    // after route
+    protected $routeParams;
 
     // create a Request from 
     public static function create()
@@ -24,11 +25,39 @@ class Request
         
         $request->get = $_GET;
         $request->post = $_POST;
-        $request->server = $_SREVER;
+        $request->server = $_SERVER;
         $request->cookie = $_COOKIE;
-        $reuqest->header = getallheaders();
+        $reuqest->header = self::getRawHeaders();
 
         return $request;
+    }
+
+    private static function getRawHeaders()
+    {
+        $headers = array();
+        foreach($_SERVER as $key => $value) {
+            if (substr($key, 0, 5) != 'HTTP_') {
+                continue;
+            }
+            $header = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
+            $headers[$header] = $value;
+        }
+        return $headers;
+    }
+
+    // set RouteParam
+    public function setRouteParam($routeParams)
+    {
+        $this->routeParams = $routeParams;
+    }
+
+    // data from routeParams
+    public function route($key, $default = null)
+    {
+        if (isset($this->routeParams[$key])){
+            return $this->routeParams[$key];
+        }
+        return $default;
     }
 
     // data from $_GET
@@ -52,8 +81,9 @@ class Request
     // data from $_REQUEST
     public function request($key, $default = null)
     {
-        if (isset($this->request[$key])) {
-            return $this->request[$key];
+        $request = array_merge($this->get, $this->post, $this->cookie, $this->routeParams);
+        if (isset($request[$key])) {
+            return $request[$key];
         }
         return $default;
     }

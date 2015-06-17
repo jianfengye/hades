@@ -6,32 +6,47 @@ use Hades\Http\Request;
 
 class Route 
 {
+    private $uri;
 
-    // routes
-    private $routes;
+    private $callback;
 
-    // return response
-    public function dispatch(Request $request)
+    private $method;
+
+    public function __construct($method, $uri, $callback)
     {
-
+        $this->method = $method;
+        $this->uri = $uri;
+        $this->callback = $callback;
     }
 
-    // set get route
-    public function get($path, $Closure)
+    // check is match
+    public function match(Request $request)
     {
-
+        $method = $request->method();
+        if (strtoupper($method) != strtoupper($this->method)) {
+            return false;
+        }
+        // TODO: check uri
+        $regex = $this->uriRegex($this->uri);
+        $match = preg_match($regex, $this->uri, $matches);
+        if (!$match) {
+            return false;
+        }
+        $request->setRouteParams($matches);
+        
+        return true;
     }
 
-    // set post route
-    public function post($path, $Closure)
+    private function uriRegex($uri)
     {
-
+        // change {id} to ([\S]+)
+        // change {id?} to ([\S]?)
+        // change {id*} to ([\S]*)
+        return preg_replace(['/{(\w+)}/', '/{(\w+)\?}/', '/{(\w+)\*}/'], ['(?P<$1>\w+)', '(?P<$1>\w?)', '(?P<$1>\w*)'], $uri);
     }
 
-    // set any route
-    public function any($path, $Closure)
+    public function action($request)
     {
-
+        return $this->callback($request);
     }
-
 }
