@@ -2,10 +2,18 @@
 
 namespace Hades\Route;
 
+use Hades\Container\Container;
+use Hades\Facade\Facade;
+
 // manager Route
-class Manager
+class Manager extends Facade
 {
     private $routes = [];
+
+    public static function getAlias()
+    {
+        return "Route";
+    }
 
     // return response
     public function dispatch(Request $request)
@@ -57,5 +65,4 @@ class Manager
             return call_user_func([$c, $action], $request);
         };
     }
-
 }

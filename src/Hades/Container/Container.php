@@ -9,31 +9,52 @@ class Container
     private $bindings = [];
 
 
-    public function bind($contract, $class)
+    public function bind($contract, $class, $args = [])
     {
-        $cluser = function() {
-            return new $class;
+        $closure = function($class, $args) {
+            $reflect = new \ReflectionClass($class);
+            return $reflect->newInstanceArgs($args);
         };
-        $this->bindings[$contract] = $cluser;
+
+        $this->bindings[$contract] = [
+            'type' => 'closure',
+            'closure' => $closure,
+            'class' => $class,
+            'args' => $args
+        ];
     }
 
-    public function singleton($contract, $class)
+    public function singleton($contract, $class, $args = [])
     {
-        $instance = new $class;
-        $this->bindings[$contract] = $instance;        
+        $reflect = new \ReflectionClass($class);
+        $instance = $reflect->newInstanceArgs($args);
+
+        $this->bindings[$contract] = [
+            'type' => 'singleton',
+            'instance' => $instance,
+            'args' => $args
+        ];      
     }
 
     public function make($contract)
     {
         if (empty($this->bindings[$contract])) {
-            throw new \Exception("class not bind");
+            throw new \Exception("class not in container");
         }
 
         $class = $this->bindings[$contract];
-        if ($class instanceof Closure) {
-            return call_user_func($class);
+        if ($class['type'] == 'closure') {
+            return call_user_func($class['closure'], $class['class'], $class['args']);
+        } else if ($class['type'] == 'singleton') {
+            return $class['instance'];
         }
 
-        return $class;
+        throw new \Exception("class not in container");
     }
+
+    public function have($contract)
+    {
+        return isset($this->bindings[$contract]);
+    }
+
 }
