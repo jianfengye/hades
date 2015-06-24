@@ -10,7 +10,7 @@ class Manager extends Facade
 {
     private $routes = [];
 
-    public static function getAlias()
+    public function getAlias()
     {
         return "Route";
     }
