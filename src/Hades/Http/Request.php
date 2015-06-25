@@ -19,17 +19,13 @@ class Request
     protected $routeParams;
 
     // create a Request from 
-    public static function create()
+    public function __construct()
     {
-        $request = new Request;
-        
-        $request->get = $_GET;
-        $request->post = $_POST;
-        $request->server = $_SERVER;
-        $request->cookie = $_COOKIE;
-        $reuqest->header = self::getRawHeaders();
-
-        return $request;
+        $this->get = $_GET;
+        $this->post = $_POST;
+        $this->server = $_SERVER;
+        $this->cookie = $_COOKIE;
+        $this->header = self::getRawHeaders();
     }
 
     private static function getRawHeaders()
@@ -46,7 +42,7 @@ class Request
     }
 
     // set RouteParam
-    public function setRouteParam($routeParams)
+    public function setRouteParams($routeParams)
     {
         $this->routeParams = $routeParams;
     }

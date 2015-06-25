@@ -2,23 +2,17 @@
 
 namespace Hades\Route;
 
-use Hades\Container\Container;
-use Hades\Facade\Facade;
+use Hades\Http\Request;
 
 // manager Route
-class Manager extends Facade
+class Manager
 {
-    private $routes = [];
-
-    public function getAlias()
-    {
-        return "Route";
-    }
+    private static $routes = [];
 
     // return response
-    public function dispatch(Request $request)
+    public static function dispatch(Request $request)
     {
-        foreach ($this->routes as $route) {
+        foreach (self::$routes as $route) {
             if ($route->match($request)) {
                 return $route->action($request);
             }
@@ -26,38 +20,38 @@ class Manager extends Facade
     }
 
     // set get route
-    public function get($uri, $callback)
+    public static function get($uri, $callback)
     {
         if (is_string($callback)) {
-            $callback = closure($callback);
+            $callback = self::str2closure($callback);
         }
 
-        $this->routes[] = new Route('get', $uri, $callback);
+        self::$routes[] = new Route('get', $uri, $callback);
     }
 
     // set post route
-    public function post($uri, $callback)
+    public static function post($uri, $callback)
     {
         if (is_string($callback)) {
-            $callback = closure($callback);
+            $callback = self::str2closure($callback);
         }
 
-        $this->routes[] = new Route('post', $uri, $callback);
+        self::$routes[] = new Route('post', $uri, $callback);
     }
 
     // set any route
-    public function any($uri, $callback)
+    public static function any($uri, $callback)
     {
         if (is_string($callback)) {
-            $callback = closure($callback);
+            $callback = self::str2closure($callback);
         }
 
-        $this->routes[] = new Route('get', $uri, $callback);
-        $this->routes[] = new Route('post', $uri, $callback);
+        self::$routes[] = new Route('get', $uri, $callback);
+        self::$routes[] = new Route('post', $uri, $callback);
     }
 
     // convert string to closure
-    private function closure($controllerAction)
+    private static function str2closure($controllerAction)
     {
         list($controller, $action) = explode('@', $controllerAction);
         return function($request) use ($controller, $action) {

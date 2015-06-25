@@ -6,12 +6,13 @@ use Hades\Http\Response;
 
 class JsonResponse extends Response
 {
-
-    public function make($data, $code = 200)
+    public static function make($data, $code = 200)
     {
-        $this->setContentType('application/json')
+        $response = new JsonResponse();
+
+        $response->setContentType('application/json')
             ->setStatusCode($code)
             ->setBody(json_encode($data));
-        return $this;
+        return $response;
     }
 }
