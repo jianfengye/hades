@@ -2,9 +2,14 @@
 
 namespace Hades\Dao;
 
-class Model
+class Model extends Facade
 {
-    private $dao;
+    private $table;
+
+    public function __construct()
+    {
+        $this->table = self::getTable();
+    }
 
     // create or update
     public function save()
@@ -20,6 +25,6 @@ class Model
 
     public function delete()
     {
-        
+
     }
 }

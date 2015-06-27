@@ -2,7 +2,7 @@
 
 namespace Hades\Dao;
 
-class Dao
+class Dao extends Facade
 {
     public static function find($id)
     {
