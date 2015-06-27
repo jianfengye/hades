@@ -28,10 +28,16 @@ class Route
         }
         // TODO: check uri
         $regex = $this->uriRegex($this->uri);
-        $match = preg_match($regex, $this->uri, $matches);
+        $regex = preg_quote($regex, '/');
+        $match = preg_match("/{$regex}/", $request->uri(), $matches);
         if (!$match) {
             return false;
         }
+
+        if ($matches[0] != $request->uri()) {
+            return false;
+        }
+
         $request->setRouteParams($matches);
         
         return true;
@@ -47,6 +53,7 @@ class Route
 
     public function action($request)
     {
-        return $this->callback($request);
+        $callback = $this->callback;
+        return $callback($request);
     }
 }

@@ -1,8 +1,10 @@
 <?php
 
+namespace Hades\Facade;
+
 abstract class Facade
 {
-    abstract protected static function getAlias();
+    abstract protected function getAlias();
 
     public static function __callStatic($method, $args)
     {

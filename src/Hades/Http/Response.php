@@ -123,16 +123,15 @@ class Response
             return $this;
         }
 
-        $statusText = "";
-        if (isset($this->statusTexts[$this->statusCode])) {
-            $statusText = $this->statusTexts[$this->statusCode];
-        }
+        $statusText = (isset($this->statusTexts[$this->statusCode])) ? : "";
 
         header(sprintf('HTTP/1.1 %s %s', $this->statusCode, $statusText), true, $this->statusCode);
 
         foreach ($this->headers as $name => $value) {
             header($name.': '.$value, false, $this->statusCode);
         }
+
+        // TODO: send cookie header
     }
 
     public function sendBody()
