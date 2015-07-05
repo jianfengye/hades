@@ -6,11 +6,28 @@ use Hades\Http\Response;
 
 class HtmlResponse extends Response
 {
-    public function make($data, $code = 200)
+    public static function make($template, $data = [])
     {
-        $this->setContentType('application/json')
-            ->setStatusCode($code)
-            ->setBody(json_encode($data));
-        return $this;
+        $response = new JsonResponse();
+
+        $response->setContentType('text/html; charset=UTF-8')
+            ->setStatusCode(200);
+
+        ob_start();
+
+        extract($data);
+
+        $file = HADES_ROOT . '/views/' . $template . '.php';
+
+        try {
+            include $file;
+        } catch (\Exception $e) {
+
+        }
+
+        $body = ob_get_contents();
+        $response->setBody($body);
+        ob_end_clean();
+        return $response;
     }
 }

@@ -2,10 +2,8 @@
 
 namespace Hades\Dao;
 
-abstrct class Facade
+trait Facade
 {
-    private static $table = '';
-
     public static function setTable($table)
     {
         self::$table = $table;

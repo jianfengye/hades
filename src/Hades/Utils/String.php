@@ -13,4 +13,10 @@ class String
         }
         return implode('_', $ret);
     }
+
+    public static function modelNameByTable($table)
+    {
+        // TODO:
+        return '\'. ucfirst($table) . 'Model';
+    }
 }

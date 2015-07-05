@@ -18,7 +18,7 @@ class Request
     // after route
     protected $routeParams;
 
-    // create a Request from 
+    // create a Request from
     public function __construct()
     {
         $this->get = $_GET;
@@ -57,31 +57,37 @@ class Request
     }
 
     // data from $_GET
-    public function get($key, $default = null)
+    public function get($key, $type, $default = null)
     {
+        $value = $default;
         if (isset($this->get[$key])) {
-            return $this->get[$key];
+            $value = $this->get[$key];
         }
-        return $default;
+        settype($value, $type);
+        return $value;
     }
 
     // data from $_POST
-    public function post($key, $default = null)
+    public function post($key, $type, $default = null)
     {
+        $value = $default;
         if (isset($this->post[$key])) {
-            return $this->post[$key];
+            $value = $this->post[$key];
         }
-        return $default;
+        settype($value, $type);
+        return $value;
     }
 
     // data from $_REQUEST
-    public function request($key, $default = null)
+    public function request($key, $type, $default = null)
     {
         $request = array_merge($this->get, $this->post, $this->cookie, $this->routeParams);
+        $value = $default;
         if (isset($request[$key])) {
-            return $request[$key];
+            $value = $request[$key];
         }
-        return $default;
+        settype($value, $type);
+        return $value;
     }
 
     // data from cookie

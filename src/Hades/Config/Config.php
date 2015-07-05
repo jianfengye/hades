@@ -11,16 +11,16 @@ Class Config
         self::$folder = $folder;
     }
 
-    public static function get($path, $default = null)
+    public static function get($paths, $default = null)
     {
-        $paths = explode('.', $path);
+        $paths = explode('.', $paths);
 
         $file = self::$folder . "/" . $paths[0] . ".php";
         if (!file_exists($file)) {
             return $default;
         }
 
-        $config = require_once($file);
+        $config = require $file;
 
         $value = $config;
         foreach ($paths as $key => $path) {
