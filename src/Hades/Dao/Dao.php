@@ -26,7 +26,7 @@ class Dao
     private $pk;
     private $modelName;
 
-    public function __constrct($table)
+    public function __construct($table)
     {
         $this->table = $table;
         $this->pk = Config::get("dao.{$this->table}.pk");
@@ -91,14 +91,14 @@ class Dao
 
         if ($orderBy) {
             $sql .= " order by ";
-            foreach ($orderby as $key => $rank) {
+            foreach ($orderBy as $key => $rank) {
                 $sql .= $key . ' ' . $rank;
                 $sql .= ',';
             }
-            $sql = trim(',', $sql);
+            $sql = trim($sql, ',');
         }
 
-        $stm = $this->pdo->prepare($sql);
+        $stm = $this->getReadPdo()->prepare($sql);
         $stm->execute($values);
         return $stm->fetchObject($this->modelName);
     }
@@ -127,15 +127,15 @@ class Dao
 
         if ($orderBy) {
             $sql .= " order by ";
-            foreach ($orderby as $key => $rank) {
+            foreach ($orderBy as $key => $rank) {
                 $sql .= $key . ' ' . $rank;
                 $sql .= ',';
             }
-            $sql = trim(',', $sql);
+            $sql = trim($sql, ',');
         }
 
-        $stm = $this->pdo->prepare($sql);
-        $stm->execute();
+        $stm = $this->getReadPdo()->prepare($sql);
+        $stm->execute($values);
         $stm->setFetchMode(\PDO::FETCH_CLASS, $this->modelName);
         $objs = $stm->fetchAll();
         return new Collections($objs);

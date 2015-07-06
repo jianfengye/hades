@@ -17,6 +17,6 @@ class String
     public static function modelNameByTable($table)
     {
         // TODO:
-        return '\'. ucfirst($table) . 'Model';
+        return '\\'. ucfirst($table) . 'Model';
     }
 }

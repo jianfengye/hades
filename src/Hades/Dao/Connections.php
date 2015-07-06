@@ -8,7 +8,7 @@ trait Connections
 {
     public function getWritePdo()
     {
-        if ($this->writePdo) {
+        if (!empty($this->writePdo)) {
             return $this->writePdo;
         }
 
@@ -24,7 +24,7 @@ trait Connections
 
     public function getReadPdo()
     {
-        if ($this->readPdo) {
+        if (!empty($this->readPdo)) {
             return $this->readPdo;
         }
 
@@ -40,7 +40,7 @@ trait Connections
 
     public function getWriteConfig()
     {
-        if ($this->writeConfig) {
+        if (!empty($this->writeConfig)) {
             return $this->writeConfig;
         }
 
@@ -54,7 +54,7 @@ trait Connections
 
     public function getReadConfig()
     {
-        if ($this->readConfig) {
+        if (!empty($this->readConfig)) {
             return $this->readConfig;
         }
 

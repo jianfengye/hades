@@ -53,4 +53,9 @@ class Collections implements ArrayAccess, IteratorAggregate, Countable, JsonSeri
     {
         return count($this->models);
     }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->models);
+    }
 }

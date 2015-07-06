@@ -20,7 +20,7 @@ class Model
     {
         if (empty($this->dao)) {
             $class = get_called_class();
-            $table = \Hades\Utils\String::fromCamlCase(substr($class, 0, -3));
+            $table = \Hades\Utils\String::fromCamlCase(substr($class, 0, -5));
             $this->dao = new \Hades\Dao\Dao($table);
         }
 
@@ -30,15 +30,21 @@ class Model
 
     private function getTableVars()
     {
-        $data = get_object_vars($this);
-        unset($data['dao']);
-        return $data;
+        return call_user_func('get_object_vars', $this);
+    }
+
+    protected function save()
+    {
+        $pk = $this->dao->getPk();
+        if (empty($this->$pk)) {
+            return $this->insert();
+        }
+        return $this->update();
     }
 
     protected function insert()
     {
         $pdo = $this->dao->getWritePdo();
-
         $fields = $replace = $values = [];
         foreach ($this->getTableVars() as $key => $value) {
             $fields[] = $key;
@@ -67,19 +73,17 @@ class Model
         return $this;
     }
 
-    protected function update(array $sets)
+    protected function update()
     {
         $pdo = $this->dao->getWritePdo();
         $pk = $this->dao->getPk();
         $table = $this->dao->getTable();
 
         $fields = $replace = $values = [];
-        foreach ($sets as $key => $value) {
+        foreach ($this->getTableVars() as $key => $value) {
             $fields[] = $key;
             $replace[] = ":{$key}";
             $values[":{$key}"] = $value;
-
-            $this->$key = $value;
         }
 
         $pk = $this->dao->getPk();
@@ -96,9 +100,9 @@ class Model
         $pk = $this->dao->getPk();
         $table = $this->dao->getTable();
 
-        $sql = "DELETE {$table} WHERE {$this->pk} = {$this->$pk}";
+        $sql = "DELETE FROM {$table} WHERE {$pk} = ?";
         $stm = $pdo->prepare($sql);
-        $stm->execute();
+        $stm->execute([$this->$pk]);
         return $this;
     }
 }
