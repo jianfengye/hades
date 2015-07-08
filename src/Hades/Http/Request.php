@@ -2,8 +2,17 @@
 
 namespace Hades\Http;
 
+use Hades\Facade\Facade;
+
 class Request
 {
+    use Facade;
+
+    public static function getAlias()
+    {
+        return 'Request';
+    }
+
     // generate from $_GET
     protected $get;
     // generate from $_POST
@@ -42,13 +51,13 @@ class Request
     }
 
     // set RouteParam
-    public function setRouteParams($routeParams)
+    protected function setRouteParams($routeParams)
     {
         $this->routeParams = $routeParams;
     }
 
     // data from routeParams
-    public function route($key, $default = null)
+    protected function route($key, $default = null)
     {
         if (isset($this->routeParams[$key])){
             return $this->routeParams[$key];
@@ -57,7 +66,7 @@ class Request
     }
 
     // data from $_GET
-    public function get($key, $type, $default = null)
+    protected function get($key, $type, $default = null)
     {
         $value = $default;
         if (isset($this->get[$key])) {
@@ -68,7 +77,7 @@ class Request
     }
 
     // data from $_POST
-    public function post($key, $type, $default = null)
+    protected function post($key, $type, $default = null)
     {
         $value = $default;
         if (isset($this->post[$key])) {
@@ -79,7 +88,7 @@ class Request
     }
 
     // data from $_REQUEST
-    public function request($key, $type, $default = null)
+    protected function request($key, $type, $default = null)
     {
         $request = array_merge($this->get, $this->post, $this->cookie, $this->routeParams);
         $value = $default;
@@ -91,7 +100,7 @@ class Request
     }
 
     // data from cookie
-    public function cookie($key, $default)
+    protected function cookie($key, $default)
     {
         if (isset($this->cookie[$key])) {
             return $this->cookie[$key];
@@ -100,7 +109,7 @@ class Request
     }
 
     // get request uri
-    public function uri()
+    protected function uri()
     {
         // in iis and forward proxy, uri in X_ORIGINAL_URL
         if (isset($this->server['X_ORIGINAL_URL']) && !empty($this->server['X_ORIGINAL_URL'])) {
@@ -111,7 +120,7 @@ class Request
     }
 
     // get http request method
-    public function method()
+    protected function method()
     {
         return strtoupper($this->server['REQUEST_METHOD']);
     }

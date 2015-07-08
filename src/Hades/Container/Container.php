@@ -33,7 +33,7 @@ class Container
             'type' => 'singleton',
             'instance' => $instance,
             'args' => $args
-        ];      
+        ];
     }
 
     public function make($contract)

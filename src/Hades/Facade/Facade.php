@@ -2,9 +2,12 @@
 
 namespace Hades\Facade;
 
-abstract class Facade
+trait Facade
 {
-    abstract protected function getAlias();
+    public static function getAlias()
+    {
+        return get_called_class();
+    }
 
     public static function __callStatic($method, $args)
     {
@@ -13,6 +16,11 @@ abstract class Facade
         $alias = self::getAlias();
         $instance = $container->make($alias);
 
-        call_user_func_array(array($instance, $method), $args);
+        return call_user_func_array(array($instance, $method), $args);
+    }
+
+    public function __call($method, $args)
+    {
+        return call_user_func_array(array($this, $method), $args);
     }
 }

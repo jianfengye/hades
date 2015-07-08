@@ -141,8 +141,31 @@ class Dao
         return new Collections($objs);
     }
 
-    protected function num(array $where)
+    protected function num(array $conds)
     {
+        $values = $whereArr = [];
+        foreach ($conds as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
 
+            if (is_array($value)) {
+                $whereArr[] = "{$key} {$value[0]} :{$key}";
+                $values[":{$key}"] = $value[1];
+            } else {
+                $whereArr[] = "{$key} = :{$key}";
+                $values[":{$key}"] = $value;
+            }
+        }
+
+        $sql = "SELECT count(*) FROM {$this->table} ";
+        if ($whereArr) {
+            $sql .= " WHERE " . implode(' AND ', $whereArr);
+        }
+
+        $stm = $this->getReadPdo()->prepare($sql);
+        $stm->execute($values);
+        $ret = $stm->fetch(\PDO::FETCH_ASSOC);
+        return intval($ret["count(*)"]);
     }
 }

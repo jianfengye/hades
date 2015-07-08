@@ -4,7 +4,7 @@ namespace Hades\Route;
 
 use Hades\Http\Request;
 
-class Route 
+class Route
 {
     private $uri;
 
@@ -39,7 +39,7 @@ class Route
         }
 
         $request->setRouteParams($matches);
-        
+
         return true;
     }
 
