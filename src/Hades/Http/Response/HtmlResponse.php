@@ -16,7 +16,6 @@ class HtmlResponse extends Response
         ob_start();
 
         extract($data);
-
         $file = HADES_ROOT . '/views/' . $template . '.php';
 
         try {

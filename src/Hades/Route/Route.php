@@ -29,12 +29,14 @@ class Route
         // TODO: check uri
         $regex = $this->uriRegex($this->uri);
         $regex = preg_quote($regex, '/');
-        $match = preg_match("/{$regex}/", $request->uri(), $matches);
+
+        $path = parse_url($request->uri(), PHP_URL_PATH);
+        $match = preg_match("/{$regex}/", $path, $matches);
         if (!$match) {
             return false;
         }
 
-        if ($matches[0] != $request->uri()) {
+        if ($matches[0] != $path) {
             return false;
         }
 
