@@ -6,6 +6,8 @@ use Hades\Config\Config;
 
 class Model
 {
+    protected $relations;
+
     public static function modelAlias($class, $model = '')
     {
         if (empty($model)) {
@@ -104,5 +106,30 @@ class Model
         $stm = $pdo->prepare($sql);
         $stm->execute([$this->$pk]);
         return $this;
+    }
+
+    public function load(string $relation)
+    {
+        $config = $this->dao->getConfig();
+        if (!isset($config['relations'])) {
+            return $this;
+        }
+
+        if (!isset($config['relations'][$relation])) {
+            return $this;
+        }
+
+        return Relation::loadModel($this, $config['relations'][$relation]);
+    }
+
+    public function __get($name)
+    {
+        if (in_array($name, $this->getTableVars())) {
+            return $this->$name;
+        }
+
+        if (isset($this->relations[$name])) {
+            return $this->relations[$name];
+        }
     }
 }

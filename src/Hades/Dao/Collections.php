@@ -15,9 +15,25 @@ class Collections implements ArrayAccess, IteratorAggregate, Countable, JsonSeri
 
     private $models = [];
 
+    protected $relations = [];
+
     public function __construct(array $models)
     {
         $this->models = $models;
+    }
+
+    public function load(string $relation)
+    {
+        $config = $this->dao->getConfig();
+        if (!isset($config['relations'])) {
+            return $this;
+        }
+
+        if (!isset($config['relations'][$relation])) {
+            return $this;
+        }
+
+        return Relation::load($this, $config['relations'][$relation]);
     }
 
     public function jsonSerialize()

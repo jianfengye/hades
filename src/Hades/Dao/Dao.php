@@ -25,11 +25,13 @@ class Dao
     private $table;
     private $pk;
     private $modelName;
+    private $config;
 
     public function __construct($table)
     {
         $this->table = $table;
         $this->pk = Config::get("dao.{$this->table}.pk");
+        $this->config = Config::get("dao.{$this->table}");
         $this->modelName = \Hades\Utils\String::modelNameByTable($this->table);
     }
 
@@ -41,6 +43,11 @@ class Dao
     public function getTable()
     {
         return $this->table;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
     }
 
     protected function find($id)
