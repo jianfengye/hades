@@ -12,11 +12,14 @@ class Route
 
     private $method;
 
-    public function __construct($method, $uri, $callback)
+    private $middlewares;
+
+    public function __construct($method, $uri, $callback, $middlewares)
     {
         $this->method = $method;
         $this->uri = $uri;
         $this->callback = $callback;
+        $this->middlewares = $middlewares;
     }
 
     // check is match
@@ -56,6 +59,19 @@ class Route
     public function action($request)
     {
         $callback = $this->callback;
-        return $callback($request);
+        $middlewares = $this->middlewares;
+
+        return call_user_func(
+            array_reduce($middlewares, function($stack, $middleware){
+                return function($request) use ($stack, $middleware) {
+                    if ($middleware instanceof Closure) {
+                        return call_user_func($middleware, $request, $stack);
+                    } else {
+                        $middlewareClass = new $middleware;
+                        return $middlewareClass->handle($request, $stack);
+                    }
+                };
+            }, $callback),
+        $request);
     }
 }
