@@ -8,10 +8,13 @@ class RedirectResponse extends Response
 {
     public static function make($url)
     {
-        $response = new Response();
+        $response = new RedirectResponse();
 
         $response->addHeader('Location', $url)
             ->setStatusCode(301);
+
+        $response->setRawData = $url;
+        
         return $response;
     }
 }

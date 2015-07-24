@@ -110,7 +110,7 @@ class Dao
         return $stm->fetchObject($this->modelName);
     }
 
-    protected function gets(array $conds, array $orderBy = [])
+    protected function gets(array $conds = [], array $orderBy = [])
     {
         $values = $whereArr = [];
         foreach ($conds as $key => $value) {
@@ -146,6 +146,32 @@ class Dao
         $stm->setFetchMode(\PDO::FETCH_CLASS, $this->modelName);
         $objs = $stm->fetchAll();
         return new Collections($objs);
+    }
+
+    protected function delete(array $conds = array())
+    {
+        $values = $whereArr = [];
+        foreach ($conds as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+
+            if (is_array($value)) {
+                $whereArr[] = "{$key} {$value[0]} :{$key}";
+                $values[":{$key}"] = $value[1];
+            } else {
+                $whereArr[] = "{$key} = :{$key}";
+                $values[":{$key}"] = $value;
+            }
+        }
+
+        $sql = "DELETE FROM {$this->table} ";
+        if ($whereArr) {
+            $sql .= " WHERE " . implode(' AND ', $whereArr);
+        }
+
+        $stm = $this->getReadPdo()->prepare($sql);
+        $stm->execute($values);
     }
 
     protected function num(array $conds)

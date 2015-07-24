@@ -17,6 +17,9 @@ class Response
     // contentType
     protected $contentType = 'text/html';
 
+    // data
+    private $data;
+
     public $statusTexts = array(
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -144,6 +147,17 @@ class Response
     {
         $this->sendHeader();
         $this->sendBody();
+        return $this;
+    }
+
+    public function getRawData()
+    {
+        return $this->data;
+    }
+
+    public function setRawData($data)
+    {
+        $this->data = $data;
         return $this;
     }
 }

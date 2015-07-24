@@ -66,7 +66,7 @@ class Request
     }
 
     // data from $_GET
-    protected function get($key, $type, $default = null)
+    protected function get($key, $type = 'string', $default = null)
     {
         $value = $default;
         if (isset($this->get[$key])) {
@@ -77,7 +77,7 @@ class Request
     }
 
     // data from $_POST
-    protected function post($key, $type, $default = null)
+    protected function post($key, $type = 'string', $default = null)
     {
         $value = $default;
         if (isset($this->post[$key])) {
@@ -88,7 +88,7 @@ class Request
     }
 
     // data from $_REQUEST
-    protected function request($key, $type, $default = null)
+    protected function request($key, $type = 'string', $default = null)
     {
         $request = array_merge($this->get, $this->post, $this->cookie, $this->routeParams);
         $value = $default;
@@ -123,5 +123,16 @@ class Request
     protected function method()
     {
         return strtoupper($this->server['REQUEST_METHOD']);
+    }
+
+    // create request by create
+    protected function create($method, $params)
+    {
+        if (strtolower($method) == 'get') {
+            $this->get = $params;
+        } else {
+            $this->post = $params;
+        }
+        return $this;
     }
 }

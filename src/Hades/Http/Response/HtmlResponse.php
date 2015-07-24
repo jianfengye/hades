@@ -8,12 +8,14 @@ class HtmlResponse extends Response
 {
     public static function make($template, $data = [])
     {
-        $response = new JsonResponse();
+        $response = new HtmlResponse();
 
         $response->setContentType('text/html; charset=UTF-8')
             ->setStatusCode(200);
 
         ob_start();
+
+        $response->setRawData($data);
 
         extract($data);
         $file = HADES_ROOT . '/views/' . $template . '.php';
@@ -27,6 +29,9 @@ class HtmlResponse extends Response
         $body = ob_get_contents();
         $response->setBody($body);
         ob_end_clean();
+        
         return $response;
     }
+
+
 }
