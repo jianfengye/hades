@@ -2,25 +2,23 @@
 
 namespace Hades\Facade;
 
+use Hades\Container\Container;
+
+// if class use this trait
+// if container has this class's alias
+// Foo::bar() is avaiable
 trait Facade
 {
-    public static function getAlias()
-    {
-        return get_called_class();
-    }
+    public static function alias() {}
 
     public static function __callStatic($method, $args)
     {
-        global $container;
-
-        $alias = self::getAlias();
-        $instance = $container->make($alias);
+        $alias = trim(self::alias(), '\\');
+        if (empty($alias)) {
+            $alias = Container::instance()->lastAlias();
+        }
+        $instance = Container::instance()->make($alias);
 
         return call_user_func_array(array($instance, $method), $args);
-    }
-
-    public function __call($method, $args)
-    {
-        return call_user_func_array(array($this, $method), $args);
     }
 }

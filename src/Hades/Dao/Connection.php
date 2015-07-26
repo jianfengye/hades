@@ -2,10 +2,29 @@
 
 namespace Hades\Dao;
 
-use Hades\Config\Config;
 
-trait Connections
+class Connection
 {
+    private $name;
+
+    private $driver;
+
+    private $hostname;
+
+    private $port;
+
+    private $password;
+
+    private $username;
+
+    private $database;
+
+    // get raw pdo
+    public function pdo()
+    {
+
+    }
+
     public function getWritePdo()
     {
         if (!empty($this->writePdo)) {

@@ -26,7 +26,6 @@ class Session
         // set handler by config
         $driver = Config::get('session.driver');
         if (empty($driver)) {
-            parent::__construct();
             return;
         }
 

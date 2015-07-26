@@ -2,50 +2,20 @@
 
 namespace Hades\Dao;
 
-use Hades\Config\Config;
+use Hades\Facade\Facade;
 
 class Dao
 {
-    use Connections;
+    use Connection, Facade;
 
-    public static function daoAlias($class)
-    {
-        eval("class {$class} extends \Hades\Dao\Dao {}");
-    }
-
-    public static function __callStatic($method, $args)
-    {
-        $class = get_called_class();
-        $table = \Hades\Utils\String::fromCamlCase(substr($class, 0, -3));
-        $instance = new $class($table);
-        return call_user_func_array(array($instance, $method), $args);
-    }
-
-
-    private $table;
-    private $pk;
-    private $modelName;
     private $config;
 
-    public function __construct($table)
+    public function __construct($table, $config)
     {
-        $this->table = $table;
-        $this->pk = Config::get("dao.{$this->table}.pk");
-        $this->config = Config::get("dao.{$this->table}");
-        $this->modelName = \Hades\Utils\String::modelNameByTable($this->table);
+        $this->config = new \Hades\Dao\Config($table, $config);
     }
 
-    public function getPk()
-    {
-        return $this->pk;
-    }
-
-    public function getTable()
-    {
-        return $this->table;
-    }
-
-    public function getConfig()
+    private function config()
     {
         return $this->config;
     }

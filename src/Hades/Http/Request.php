@@ -8,11 +8,6 @@ class Request
 {
     use Facade;
 
-    public static function getAlias()
-    {
-        return 'Request';
-    }
-
     // generate from $_GET
     protected $get;
     // generate from $_POST

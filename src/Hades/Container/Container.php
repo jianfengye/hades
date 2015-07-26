@@ -5,10 +5,46 @@ namespace Hades\Container;
 // container
 class Container
 {
+    protected function __construct() {}
+
+    private static $instance;
+
+    private $last_alias;
+
     // class bindings
     private $bindings = [];
 
+    // get global instace
+    public static function instance()
+    {
+        if (null != static::$instance) {
+            return static::$instance;
+        }
 
+        $container = new static();
+
+        static::$instance = $container;
+        return static::$instance;
+    }
+
+    // load config
+    public function load($config)
+    {
+        if (isset($config['bind'])) {
+            foreach ($config['bind'] as $key => $value) {
+                $this->bind($key, $value);
+            }
+        }
+
+        if (isset($config['singleton'])) {
+            foreach ($config['singleton'] as $key => $value) {
+                $this->singleton($key, $value);
+            }
+        }
+    }
+
+    // bind a class
+    // the class will have new instance when use
     public function bind($contract, $class, $args = [])
     {
         $closure = function($class, $args) {
@@ -24,6 +60,8 @@ class Container
         ];
     }
 
+    // bind a class
+    // the class will instance one time when use
     public function singleton($contract, $class, $args = [])
     {
         $reflect = new \ReflectionClass($class);
@@ -36,10 +74,11 @@ class Container
         ];
     }
 
+    // make some contract
     public function make($contract)
     {
         if (empty($this->bindings[$contract])) {
-            throw new \Exception("class not in container");
+            throw new \LogicException('Not found contract:' . $contract);
         }
 
         $class = $this->bindings[$contract];
@@ -49,12 +88,24 @@ class Container
             return $class['instance'];
         }
 
-        throw new \Exception("class not in container");
+        throw new \LogicException('Not found contract:' . $contract);
     }
 
+    // check is there exist contract
     public function have($contract)
     {
         return isset($this->bindings[$contract]);
     }
 
+    public function alias($contract)
+    {
+        $this->last_alias = $contract;
+        $class = $this->bindings[$contract]['class'];
+        class_alias($class, $contract);
+    }
+
+    public function lastAlias()
+    {
+        return $this->last_alias;
+    }
 }

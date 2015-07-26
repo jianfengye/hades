@@ -2,7 +2,7 @@
 
 namespace Hades\Test;
 
-class HadeTest extends \PHPUnit_Framework_TestCase
+class TestCase extends \PHPUnit_Framework_TestCase
 {
     public function callAction($controllerAction, $request)
     {

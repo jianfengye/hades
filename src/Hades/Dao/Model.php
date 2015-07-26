@@ -8,27 +8,17 @@ class Model
 {
     protected $relations;
 
-    public static function modelAlias($class, $model = '')
-    {
-        if (empty($model)) {
-            $model = '\Hades\Dao\Model';
-        }
-        eval("class {$class} extends {$model} {}");
-    }
-
     private $dao;
 
-    public function __call($method, $args)
+    private $table;
+
+    private $config;
+
+    public function __constrct($table, $config)
     {
-        if (empty($this->dao)) {
-            $class = get_called_class();
-            $table = \Hades\Utils\String::fromCamlCase(substr($class, 0, -5));
-            $this->dao = new \Hades\Dao\Dao($table);
-        }
-
-        return call_user_func_array(array($this, $method), $args);
+        $this->table = $table;
+        $this->config = $config;
     }
-
 
     private function getTableVars()
     {
