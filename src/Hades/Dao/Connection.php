@@ -19,82 +19,48 @@ class Connection
 
     private $database;
 
+    public function __construct($name, $config)
+    {
+        $this->name = $name;
+        if (!empty($config['driver'])) {
+            $this->driver = $config['driver'];
+        }
+        if (!empty($config['hostname'])) {
+            $this->hostname = $config['hostname'];
+        }
+        if (!empty($config['port'])) {
+            $this->port = $config['port'];
+        }
+        if (!empty($config['password'])) {
+            $this->password = $config['password'];
+        }
+        if (!empty($config['username'])) {
+            $this->username = $config['username'];
+        }
+        if (!empty($config['database'])) {
+            $this->database = $config['database'];
+        }
+    }
+
     // get raw pdo
     public function pdo()
     {
-
-    }
-
-    public function getWritePdo()
-    {
-        if (!empty($this->writePdo)) {
-            return $this->writePdo;
+        $dns = "{this->driver}:";
+        if (!empty($this->database)) {
+            $dns .= "dbname={$this->database};";
+        }
+        if (!empty($this->hostname)) {
+            $dns .= "host={$this->hostname};";
+        }
+        if (!empty($this->port)) {
+            $dns .= "port={$this->port};";
         }
 
-        $config = $this->getWriteConfig();
-        $driver = $config['driver'];
-        $pdo = new \PDO("{$driver}:dbname={$config['database']};
-            host={$config['hostname']};
-            port={$config['port']}", $config['username'], $config['password']);
-        $this->writePdo = $pdo;
-        $this->writeConfig = $config;
-        return $this->writePdo;
+        return new \PDO($dns, $this->username, $this->password);
     }
 
-    public function getReadPdo()
+    public function action($builder)
     {
-        if (!empty($this->readPdo)) {
-            return $this->readPdo;
-        }
-
-        $config = $this->getReadConfig();
-        $driver = $config['driver'];
-        $pdo = new \PDO("{$driver}:dbname={$config['database']};
-            host={$config['hostname']};
-            port={$config['port']}", $config['username'], $config['password']);
-        $this->readPdo = $pdo;
-        $this->readConfig = $config;
-        return $this->readPdo;
-    }
-
-    public function getWriteConfig()
-    {
-        if (!empty($this->writeConfig)) {
-            return $this->writeConfig;
-        }
-
-        $masters = Config::get('database.connection.master');
-        $databases = Config::get('database.database', 22);
-        $index = rand(0, count($masters) - 1);
-        $config = $databases[$masters[$index]];
-        $this->writeConfig = $config;
-        return $config;
-    }
-
-    public function getReadConfig()
-    {
-        if (!empty($this->readConfig)) {
-            return $this->readConfig;
-        }
-
-        $slaves = Config::get('database.connection.slave');
-        $databases = Config::get('database.database');
-
-        $index = rand(0, count($slaves) - 1);
-        $config = $databases[$slaves[$index]];
-        $this->readConfig = $config;
-        return $config;
-    }
-
-    public function getWriteDriver()
-    {
-        $config = $this->getWriteConfig();
-        return $config['driver'];
-    }
-
-    public function getReaderDriver()
-    {
-        $config = $this->getReadConfig();
-        return $config['driver'];
+        
     }
 }

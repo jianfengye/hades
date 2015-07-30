@@ -6,13 +6,13 @@ use Hades\Facade\Facade;
 
 class Dao
 {
-    use Connection, Facade;
+    use Facade;
 
     private $config;
 
     public function __construct($table, $config)
     {
-        $this->config = new \Hades\Dao\Config($table, $config);
+        $this->config = new Config($table, $config);
     }
 
     private function config()
@@ -20,14 +20,17 @@ class Dao
         return $this->config;
     }
 
-    protected function find($id)
+    protected function builder()
     {
-        $pdo = $this->getReadPdo();
+        return new Builder($this->config);
+    }
 
-        $sql = "SELECT * FROM {$this->table} WHERE {$this->pk} = ?";
-        $stm = $pdo->prepare($sql);
-        $stm->execute([$id]);
-        return $stm->fetchObject($this->modelName);
+    protected function find($id, $columns = ['*'])
+    {
+        $builder = $this->builder()->where($this->config->pk(), $id)->columns($columns);
+        return $builder->slave()->action();
+
+        return Connector::instance()->slave()->action($builder);
     }
 
     protected function finds(array $ids)

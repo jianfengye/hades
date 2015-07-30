@@ -2,6 +2,7 @@
 
 namespace Hades\Dao;
 
+// dao table config
 class Config
 {
     private $table;
