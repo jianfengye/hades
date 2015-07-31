@@ -59,8 +59,9 @@ class Connection
         return new \PDO($dns, $this->username, $this->password);
     }
 
-    public function action($builder)
+
+    public function driver()
     {
-        
+        return $this->driver;
     }
 }

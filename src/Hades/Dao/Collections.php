@@ -11,29 +11,24 @@ use IteratorAggregate;
 
 class Collections implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
 {
-    private $dao;
-
     private $models = [];
-
-    protected $relations = [];
+    private $config;
 
     public function __construct(array $models)
     {
         $this->models = $models;
+        $this->config = current($models)->config();
     }
+
+    public function config()
+    {
+        return $this->config;
+    }
+
 
     public function load(string $relation)
     {
-        $config = $this->dao->getConfig();
-        if (!isset($config['relations'])) {
-            return $this;
-        }
-
-        if (!isset($config['relations'][$relation])) {
-            return $this;
-        }
-
-        return Relation::load($this, $config['relations'][$relation]);
+        return Relation::load($this, $relation);
     }
 
     public function jsonSerialize()

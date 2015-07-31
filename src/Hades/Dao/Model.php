@@ -6,23 +6,23 @@ use Hades\Config\Config;
 
 class Model
 {
-    protected $relations;
-
-    private $dao;
-
-    private $table;
+    use Facade;
 
     private $config;
 
-    public function __constrct($table, $config)
+    public function __construct($table, $config)
     {
-        $this->table = $table;
-        $this->config = $config;
+        $this->config = new Config($table, $config);
     }
 
-    private function getTableVars()
+    private function config()
     {
-        return call_user_func('get_object_vars', $this);
+        return $this->config;
+    }
+
+    protected function builder()
+    {
+        return new Builder($this->config);
     }
 
     protected function save()
@@ -36,66 +36,55 @@ class Model
 
     protected function insert()
     {
-        $pdo = $this->dao->getWritePdo();
-        $fields = $replace = $values = [];
-        foreach ($this->getTableVars() as $key => $value) {
-            $fields[] = $key;
-            $replace[] = ":{$key}";
-            $values[":{$key}"] = $value;
+        $fields = call_user_func('get_object_vars', $this);
+        $builder = $this->builder()->master()->action('INSERT');
+        foreach ($fields as $key => $value) {
+            $builder->set($key, $value);
         }
 
-        $pk = $this->dao->getPk();
-        $table = $this->dao->getTable();
-
-        if ($this->dao->getWriteDriver() == 'pgsql') {
-            $sql = "INSERT INTO {$table} (". implode(',', $fields) .") values (". implode(',', $replace) .") returning {$pk}";
-            $stm = $pdo->prepare($sql);
-            $stm->execute($values);
-            $obj = $stm->fetchObject();
+        $pk = $this->config->pk();
+        if ($builder->connection()->driver() == 'pgsql') {
+            $builder->returning([$pk]);
+            $obj = $builder->get();
             $this->$pk = $obj->$pk;
-        } else {
-            $sql = "INSERT INTO {$table} (". implode(',', $fields) .") values (". implode(',', $replace) .")";
-            $stm = $pdo->prepare($sql);
-            $stm->execute($values);
-
-            $insert_id = $pdo->lastInsertId();
-            $this->$pk = $insert_id;
+            return $this;
         }
 
+        $builder->execute();
+        $this->$pk = $builder->lastInsertId();
         return $this;
     }
 
     protected function update()
     {
-        $pdo = $this->dao->getWritePdo();
-        $pk = $this->dao->getPk();
-        $table = $this->dao->getTable();
+        $fields = call_user_func('get_object_vars', $this);
+        $pk = $this->config->pk();
 
-        $fields = $replace = $values = [];
-        foreach ($this->getTableVars() as $key => $value) {
-            $fields[] = $key;
-            $replace[] = ":{$key}";
-            $values[":{$key}"] = $value;
+        if (empty($this->$pk)) {
+            throw new \LogicException('Model Primary Key Can Not Be Empty');
         }
 
-        $pk = $this->dao->getPk();
-
-        $sql = "UPDATE {$table} SET (". implode(',', $fields) .") = (". implode(',', $replace) .") where {$pk} = {$this->$pk}";
-        $stm = $pdo->prepare($sql);
-        $stm->execute($values);
+        $builder = $this->builder()->master()->action('UPDATE');
+        foreach ($fields as $key => $value) {
+            if ($key != $pk) {
+                $builder->set($key, $value);
+            }
+        }
+        $builder->where($pk, $this->$pk);
+        $builder->execute();
         return $this;
     }
 
     protected function delete()
     {
-        $pdo = $this->dao->getWritePdo();
-        $pk = $this->dao->getPk();
-        $table = $this->dao->getTable();
+        $pk = $this->config->pk();
+        if (empty($this->$pk)) {
+            throw new \LogicException('Model Primary Key Can Not Be Empty');
+        }
 
-        $sql = "DELETE FROM {$table} WHERE {$pk} = ?";
-        $stm = $pdo->prepare($sql);
-        $stm->execute([$this->$pk]);
-        return $this;
+        $builder = $this->builder()->master()->action('DELETE');
+        $builder->where($pk, $this->$pk);
+        $builder->execute();
     }
 
     public function load(string $relation)
@@ -114,7 +103,7 @@ class Model
 
     public function __get($name)
     {
-        if (in_array($name, $this->getTableVars())) {
+        if (in_array($name, call_user_func('get_object_vars', $this))) {
             return $this->$name;
         }
 

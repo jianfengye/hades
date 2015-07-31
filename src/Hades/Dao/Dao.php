@@ -25,153 +25,75 @@ class Dao
         return new Builder($this->config);
     }
 
-    protected function find($id, $columns = ['*'])
+    protected function find($id, $columns = [])
     {
         $builder = $this->builder()->where($this->config->pk(), $id)->columns($columns);
-        return $builder->slave()->action();
-
-        return Connector::instance()->slave()->action($builder);
+        return $builder->slave()->get();
     }
 
-    protected function finds(array $ids)
+    protected function finds(array $ids, $columns = [])
     {
-        if (empty($ids)) {
-            return [];
-        }
-
-        $sql = "SELECT * FROM {$this->table} WHERE {$this->pk} in (". implode(',', $ids) .")";
-        $stm = $this->getReadPdo()->prepare($sql);
-        $stm->execute();
-        $stm->setFetchMode(\PDO::FETCH_CLASS, $this->modelName);
-        $objs = $stm->fetchAll();
-        return new Collections($objs);
+        $builder = $this->builder()->whereIn($this->config->pk(), $ids)->columns($columns);
+        return $builder->slave()->gets();
     }
 
-    protected function get(array $conds, array $orderBy = [])
+    protected function get(array $wheres, array $orderBy = [], $columns = [])
     {
-        $values = $whereArr = [];
-        foreach ($conds as $key => $value) {
-            if ($value === null) {
+        $builder = $this->builder();
+        foreach ($wheres as $where) {
+            if (!is_array($where)) {
                 continue;
             }
-
-            if (is_array($value)) {
-                $whereArr[] = "{$key} {$value[0]} :{$key}";
-                $values[":{$key}"] = $value[1];
-            } else {
-                $whereArr[] = "{$key} = :{$key}";
-                $values[":{$key}"] = $value;
-            }
+            $builder = call_user_func_array([$builder, 'where'], $where);
         }
 
-        $sql = "SELECT * FROM {$this->table} ";
-        if ($whereArr) {
-            $sql .= " WHERE " . implode(' AND ', $whereArr);
+        foreach ($orderBy as $key => $value) {
+            $builder = call_user_func_array([$builder, 'orderBy'], [$key, $value]);
         }
-
-        if ($orderBy) {
-            $sql .= " order by ";
-            foreach ($orderBy as $key => $rank) {
-                $sql .= $key . ' ' . $rank;
-                $sql .= ',';
-            }
-            $sql = trim($sql, ',');
-        }
-
-        $stm = $this->getReadPdo()->prepare($sql);
-        $stm->execute($values);
-        return $stm->fetchObject($this->modelName);
+        $builder = $builder->columns($columns)
+        return $builder->slave()->get();
     }
 
-    protected function gets(array $conds = [], array $orderBy = [])
+    protected function gets(array $wheres = [], array $orderBy = [], $columns = [])
     {
-        $values = $whereArr = [];
-        foreach ($conds as $key => $value) {
-            if ($value === null) {
+        $builder = $this->builder();
+        foreach ($wheres as $where) {
+            if (!is_array($where)) {
                 continue;
             }
-
-            if (is_array($value)) {
-                $whereArr[] = "{$key} {$value[0]} :{$key}";
-                $values[":{$key}"] = $value[1];
-            } else {
-                $whereArr[] = "{$key} = :{$key}";
-                $values[":{$key}"] = $value;
-            }
+            $builder = call_user_func_array([$builder, 'where'], $where);
         }
 
-        $sql = "SELECT * FROM {$this->table} ";
-        if ($whereArr) {
-            $sql .= " WHERE " . implode(' AND ', $whereArr);
+        foreach ($orderBy as $key => $value) {
+            $builder = call_user_func_array([$builder, 'orderBy'], [$key, $value]);
         }
-
-        if ($orderBy) {
-            $sql .= " order by ";
-            foreach ($orderBy as $key => $rank) {
-                $sql .= $key . ' ' . $rank;
-                $sql .= ',';
-            }
-            $sql = trim($sql, ',');
-        }
-
-        $stm = $this->getReadPdo()->prepare($sql);
-        $stm->execute($values);
-        $stm->setFetchMode(\PDO::FETCH_CLASS, $this->modelName);
-        $objs = $stm->fetchAll();
-        return new Collections($objs);
+        $builder = $builder->columns($columns)
+        return $builder->slave()->gets();
     }
 
-    protected function delete(array $conds = array())
+    protected function delete(array $wheres = array())
     {
-        $values = $whereArr = [];
-        foreach ($conds as $key => $value) {
-            if ($value === null) {
+        $builder = $this->builder()->action('DELETE');
+        foreach ($wheres as $where) {
+            if (!is_array($where)) {
                 continue;
             }
-
-            if (is_array($value)) {
-                $whereArr[] = "{$key} {$value[0]} :{$key}";
-                $values[":{$key}"] = $value[1];
-            } else {
-                $whereArr[] = "{$key} = :{$key}";
-                $values[":{$key}"] = $value;
-            }
+            $builder = call_user_func_array([$builder, 'where'], $where);
         }
 
-        $sql = "DELETE FROM {$this->table} ";
-        if ($whereArr) {
-            $sql .= " WHERE " . implode(' AND ', $whereArr);
-        }
-
-        $stm = $this->getReadPdo()->prepare($sql);
-        $stm->execute($values);
+        return $builder->master()->execute();
     }
 
-    protected function num(array $conds)
+    protected function num(array $wheres)
     {
-        $values = $whereArr = [];
-        foreach ($conds as $key => $value) {
-            if ($value === null) {
+        $builder = $this->builder();
+        foreach ($wheres as $where) {
+            if (!is_array($where)) {
                 continue;
             }
-
-            if (is_array($value)) {
-                $whereArr[] = "{$key} {$value[0]} :{$key}";
-                $values[":{$key}"] = $value[1];
-            } else {
-                $whereArr[] = "{$key} = :{$key}";
-                $values[":{$key}"] = $value;
-            }
+            $builder = call_user_func_array([$builder, 'where'], $where);
         }
 
-        $sql = "SELECT count(*) FROM {$this->table} ";
-        if ($whereArr) {
-            $sql .= " WHERE " . implode(' AND ', $whereArr);
-        }
-
-        $stm = $this->getReadPdo()->prepare($sql);
-        $stm->execute($values);
-        $ret = $stm->fetch(\PDO::FETCH_ASSOC);
-        return intval($ret["count(*)"]);
+        return $builder->slave()->count();
     }
 }

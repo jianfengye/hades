@@ -9,6 +9,8 @@ class Config
 
     private $config;
 
+    private $relations;
+
     public function __construct($table, $config)
     {
         $this->table = $table;
@@ -36,5 +38,13 @@ class Config
             $model = $this->config['model'];
         }
         return $model;
+    }
+
+    public function relation($name)
+    {
+        if (empty($this->config['relations'][$name])) {
+            return [];
+        }
+        return $this->config['relations'][$name];
     }
 }

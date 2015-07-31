@@ -4,8 +4,12 @@ namespace Hades\Dao;
 
 class Register
 {
+    private static $dao;
+
     public static function load($container, $dao)
     {
+        self::$dao = $dao;
+
         foreach ($dao as $table => $config) {
             $model_name = self::modelName($table);
             $alias_model = '\Hades\Dao\Model';
@@ -22,14 +26,19 @@ class Register
         }
     }
 
-    private static  function modelName($table)
+    public static  function modelName($table)
     {
         return self::tableToClass($table) . 'Model';
     }
 
-    private static function daoName($table)
+    public static function daoName($table)
     {
         return self::tableToClass($table) . 'Dao';
+    }
+
+    public static function config($table)
+    {
+        return $this->dao[$table];
     }
 
     // convert table to className
