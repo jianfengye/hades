@@ -17,20 +17,20 @@ class Relation
         }
 
         $builder = new Builder(new Config($table, $config));
-        $key = $config['key'];
-        $relate_key = $config['relate_key'];
+        $key = $relation['key'];
+        $relate_key = $relation['relate_key'];
         switch ($type) {
             case 'has_many':
                 $builder->where($relate_key, $model->$key);
-                $model->$name = $builder->gets();
+                $model->setRelation($name, $builder->gets());
                 return $model;
             case 'has_one':
                 $builder->where($relate_key, $model->$key);
-                $model->$name = $builder->get();
+                $model->setRelation($name, $builder->get());
                 return $model;
             case 'belong_to':
                 $builder->where($relate_key, $model->$key);
-                $model->$name = $builder->get();
+                $model->setRelation($name, $builder->get());
                 return $model;
             default:
                 return $model;
@@ -38,7 +38,7 @@ class Relation
         return $model;
     }
 
-    public static function loadCollection($collection, $relation)
+    public static function loadCollection($collection, $name)
     {
         if (empty($collection->config()->relation($name))) {
             return $collection;
@@ -53,8 +53,8 @@ class Relation
         }
 
         $builder = new Builder(new Config($table, $config));
-        $key = $config['key'];
-        $relate_key = $config['relate_key'];
+        $key = $relation['key'];
+        $relate_key = $relation['relate_key'];
         $keys = [];
         foreach ($collection as $model) {
             $keys[] = $model->$key;
@@ -71,7 +71,7 @@ class Relation
                             $tmpModels[] = $relateModel;
                         }
                     }
-                    $model->$name = new Collection($tmpModels);
+                    $model->setRelation($name, new Collection($tmpModels));
                 }
                 return $collection;
             case 'has_one':
@@ -80,7 +80,7 @@ class Relation
                     $my_key = $model->$key;
                     foreach ($relateModels as $relateModel) {
                         if ($my_key == $relateModel->$relate_key){
-                            $model->$name = $relateModel;
+                            $model->setRelation($name, $relateModel);
                             break;
                         }
                     }
@@ -92,7 +92,7 @@ class Relation
                     $my_key = $model->$key;
                     foreach ($relateModels as $relateModel) {
                         if ($my_key == $relateModel->$relate_key){
-                            $model->$name = $relateModel;
+                            $model->setRelation($name, $relateModel);
                             break;
                         }
                     }

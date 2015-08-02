@@ -9,13 +9,16 @@ use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
 
-class Collections implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
+class Collection implements ArrayAccess, IteratorAggregate, Countable, JsonSerializable
 {
     private $models = [];
     private $config;
 
     public function __construct(array $models)
     {
+        if (empty($models)) {
+            return;
+        }
         $this->models = $models;
         $this->config = current($models)->config();
     }
@@ -25,10 +28,9 @@ class Collections implements ArrayAccess, IteratorAggregate, Countable, JsonSeri
         return $this->config;
     }
 
-
-    public function load(string $relation)
+    public function load($relation)
     {
-        return Relation::load($this, $relation);
+        return Relation::loadCollection($this, $relation);
     }
 
     public function jsonSerialize()

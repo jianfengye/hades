@@ -97,15 +97,10 @@ class Container
         return isset($this->bindings[$contract]);
     }
 
-    public function alias($contract)
-    {
-        $this->last_alias = $contract;
-        $class = $this->bindings[$contract]['class'];
-        class_alias($class, $contract);
-    }
-
-    public function lastAlias()
-    {
-        return $this->last_alias;
+    public function getBinding($contract) {
+        if ($this->have($contract)) {
+            return $this->bindings[$contract];
+        }
+        return null;
     }
 }

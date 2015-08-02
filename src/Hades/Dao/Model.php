@@ -1,8 +1,7 @@
 <?php
 
 namespace Hades\Dao;
-
-use Hades\Config\Config;
+use Hades\Facade\Facade;
 
 class Model
 {
@@ -10,31 +9,43 @@ class Model
 
     private $config;
 
-    public function __construct($table, $config)
+    private $relations = [];
+
+    public function __construct($config = [])
     {
-        $this->config = new Config($table, $config);
+        if ($config) {
+            $this->config = $config;
+            return;
+        }
+
+        $alias = self::alias();
+        $binding = \Hades\Container\Container::instance()->getBinding($alias);
+        if (empty($binding)) {
+            throw new \LogicException("model {$alias} does not contain in container");
+        }
+        $this->config = current($binding['args']);
     }
 
-    private function config()
+    public function config()
     {
         return $this->config;
     }
 
-    protected function builder()
+    public function builder()
     {
         return new Builder($this->config);
     }
 
-    protected function save()
+    public function save()
     {
-        $pk = $this->dao->getPk();
+        $pk = $this->config()->pk();
         if (empty($this->$pk)) {
             return $this->insert();
         }
         return $this->update();
     }
 
-    protected function insert()
+    public function insert()
     {
         $fields = call_user_func('get_object_vars', $this);
         $builder = $this->builder()->master()->action('INSERT');
@@ -55,7 +66,7 @@ class Model
         return $this;
     }
 
-    protected function update()
+    public function update()
     {
         $fields = call_user_func('get_object_vars', $this);
         $pk = $this->config->pk();
@@ -75,7 +86,7 @@ class Model
         return $this;
     }
 
-    protected function delete()
+    public function delete()
     {
         $pk = $this->config->pk();
         if (empty($this->$pk)) {
@@ -87,18 +98,14 @@ class Model
         $builder->execute();
     }
 
-    public function load(string $relation)
+    public function load($relation)
     {
-        $config = $this->dao->getConfig();
-        if (!isset($config['relations'])) {
-            return $this;
-        }
+        return Relation::loadModel($this, $relation);
+    }
 
-        if (!isset($config['relations'][$relation])) {
-            return $this;
-        }
-
-        return Relation::loadModel($this, $config['relations'][$relation]);
+    public function setRelation($name, $obj)
+    {
+        $this->relations[$name] = $obj;
     }
 
     public function __get($name)

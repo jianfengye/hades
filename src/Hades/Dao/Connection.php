@@ -19,6 +19,8 @@ class Connection
 
     private $database;
 
+    private $pdo;
+
     public function __construct($name, $config)
     {
         $this->name = $name;
@@ -45,7 +47,11 @@ class Connection
     // get raw pdo
     public function pdo()
     {
-        $dns = "{this->driver}:";
+        if (!empty($this->pdo)) {
+            return $this->pdo;
+        }
+
+        $dns = "{$this->driver}:";
         if (!empty($this->database)) {
             $dns .= "dbname={$this->database};";
         }
@@ -56,7 +62,15 @@ class Connection
             $dns .= "port={$this->port};";
         }
 
-        return new \PDO($dns, $this->username, $this->password);
+        $this->pdo = new \PDO($dns, $this->username, $this->password);
+        return $this->pdo;
+    }
+
+    public function reconnect()
+    {
+        $this->pdo = null;
+        $this->pdo();
+        return $this;
     }
 
 

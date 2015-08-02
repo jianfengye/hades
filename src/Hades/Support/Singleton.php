@@ -1,6 +1,6 @@
 <?php
 
-namespace Hades\Trait;
+namespace Hades\Support;
 
 trait Singleton
 {

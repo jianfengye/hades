@@ -12,17 +12,26 @@ class Register
 
         foreach ($dao as $table => $config) {
             $model_name = self::modelName($table);
+            $configConstr = new \Hades\Dao\Config($table, $config);
+
             $alias_model = '\Hades\Dao\Model';
 
             if (isset($config['model'])) {
                 $alias_model = $config['model'];
             }
 
-            $container->bind($model_name, $alias_model, [$table, $config]);
+            if (!class_exists($model_name, false)) {
+                eval("class {$model_name} extends {$alias_model} {} ");
+            }
+            $container->bind($model_name, "\\{$model_name}", [$configConstr]);
 
             $dao_name = self::daoName($table);
             $alias_dao = '\Hades\Dao\Dao';
-            $container->bind($dao_name, $alias_dao, [$table, $config]);
+
+            if (!class_exists($dao_name, false)) {
+                eval("class {$dao_name} extends {$alias_dao} {} ");
+            }
+            $container->bind($dao_name, "\\{$dao_name}", [$configConstr]);
         }
     }
 
@@ -38,7 +47,7 @@ class Register
 
     public static function config($table)
     {
-        return $this->dao[$table];
+        return self::$dao[$table];
     }
 
     // convert table to className

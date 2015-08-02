@@ -10,12 +10,12 @@ class Dao
 
     private $config;
 
-    public function __construct($table, $config)
+    public function __construct($config)
     {
-        $this->config = new Config($table, $config);
+        $this->config = $config;
     }
 
-    private function config()
+    protected function config()
     {
         return $this->config;
     }
@@ -28,72 +28,84 @@ class Dao
     protected function find($id, $columns = [])
     {
         $builder = $this->builder()->where($this->config->pk(), $id)->columns($columns);
-        return $builder->slave()->get();
+        return $builder->get();
     }
 
     protected function finds(array $ids, $columns = [])
     {
         $builder = $this->builder()->whereIn($this->config->pk(), $ids)->columns($columns);
-        return $builder->slave()->gets();
+        return $builder->gets();
     }
 
     protected function get(array $wheres, array $orderBy = [], $columns = [])
     {
         $builder = $this->builder();
-        foreach ($wheres as $where) {
+        foreach ($wheres as $key => $where) {
+            $args = [$key];
             if (!is_array($where)) {
-                continue;
+                $args = array_merge($args, ['=' , $where]);
+            } else {
+                $args = array_merge($args, $where);
             }
-            $builder = call_user_func_array([$builder, 'where'], $where);
+            $builder = call_user_func_array([$builder, 'where'], $args);
         }
 
         foreach ($orderBy as $key => $value) {
             $builder = call_user_func_array([$builder, 'orderBy'], [$key, $value]);
         }
-        $builder = $builder->columns($columns)
-        return $builder->slave()->get();
+        $builder = $builder->columns($columns);
+        return $builder->get();
     }
 
     protected function gets(array $wheres = [], array $orderBy = [], $columns = [])
     {
         $builder = $this->builder();
-        foreach ($wheres as $where) {
+        foreach ($wheres as $key => $where) {
+            $args = [$key];
             if (!is_array($where)) {
-                continue;
+                $args = array_merge($args, ['=' , $where]);
+            } else {
+                $args = array_merge($args, $where);
             }
-            $builder = call_user_func_array([$builder, 'where'], $where);
+            $builder = call_user_func_array([$builder, 'where'], $args);
         }
 
         foreach ($orderBy as $key => $value) {
             $builder = call_user_func_array([$builder, 'orderBy'], [$key, $value]);
         }
-        $builder = $builder->columns($columns)
-        return $builder->slave()->gets();
+        $builder = $builder->columns($columns);
+        return $builder->gets();
     }
 
     protected function delete(array $wheres = array())
     {
         $builder = $this->builder()->action('DELETE');
-        foreach ($wheres as $where) {
+        foreach ($wheres as $key => $where) {
+            $args = [$key];
             if (!is_array($where)) {
-                continue;
+                $args = array_merge($args, ['=' , $where]);
+            } else {
+                $args = array_merge($args, $where);
             }
-            $builder = call_user_func_array([$builder, 'where'], $where);
+            $builder = call_user_func_array([$builder, 'where'], $args);
         }
 
-        return $builder->master()->execute();
+        return $builder->execute();
     }
 
     protected function num(array $wheres)
     {
         $builder = $this->builder();
-        foreach ($wheres as $where) {
+        foreach ($wheres as $key => $where) {
+            $args = [$key];
             if (!is_array($where)) {
-                continue;
+                $args = array_merge($args, ['=' , $where]);
+            } else {
+                $args = array_merge($args, $where);
             }
-            $builder = call_user_func_array([$builder, 'where'], $where);
+            $builder = call_user_func_array([$builder, 'where'], $args);
         }
 
-        return $builder->slave()->count();
+        return $builder->count();
     }
 }

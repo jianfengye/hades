@@ -9,13 +9,13 @@ use Hades\Container\Container;
 // Foo::bar() is avaiable
 trait Facade
 {
-    public static function alias() {}
+    public static function alias() { return get_called_class(); }
 
     public static function __callStatic($method, $args)
     {
         $alias = trim(self::alias(), '\\');
         if (empty($alias)) {
-            $alias = Container::instance()->lastAlias();
+            throw new \LogicException('use Facade must set alias');
         }
         $instance = Container::instance()->make($alias);
 
