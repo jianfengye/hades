@@ -103,4 +103,12 @@ class Container
         }
         return null;
     }
+
+    public function alias($contract)
+    {
+        $this->last_alias = $contract;
+        $class = $this->bindings[$contract]['class'];
+        class_alias($class, $contract);
+    }
+
 }
