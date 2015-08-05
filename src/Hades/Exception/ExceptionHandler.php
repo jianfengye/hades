@@ -1,12 +1,13 @@
 <?php
 
 namespace Hades\Exception;
+use Hades\Log\Logger;
 
 class ExceptionHandler
 {
     private $exception;
 
-    public function __constrct($exception)
+    public function __construct($exception)
     {
         $this->exception = $exception;
     }
@@ -23,6 +24,8 @@ class ExceptionHandler
 
     public function render()
     {
+        Logger::instance()->error($this->exception->getMessage(), $this->exception->getTrace());
+
         if (php_sapi_name() == 'cli') {
             return $this->renderConsole();
         } else {

@@ -25,15 +25,14 @@ class Route
     // check is match
     public function match(Request $request)
     {
-        $method = $request->method();
+        $method = $request->httpmethod();
         if (strtoupper($method) != strtoupper($this->method)) {
             return false;
         }
         // TODO: check uri
         $regex = $this->uriRegex($this->uri);
-        $regex = preg_quote($regex, '/');
 
-        $path = parse_url($request->uri(), PHP_URL_PATH);
+        $path = parse_url(trim($request->uri(), '#'), PHP_URL_PATH);
         $match = preg_match("/{$regex}/", $path, $matches);
         if (!$match) {
             return false;
@@ -53,7 +52,8 @@ class Route
         // change {id} to ([\S]+)
         // change {id?} to ([\S]?)
         // change {id*} to ([\S]*)
-        return preg_replace(['/{(\w+)}/', '/{(\w+)\?}/', '/{(\w+)\*}/'], ['(?P<$1>\w+)', '(?P<$1>\w?)', '(?P<$1>\w*)'], $uri);
+        $uri = str_replace('/', '\/', $uri);
+        return preg_replace(['/{(\w+)}/', '/{(\w+)\?}/', '/{(\w+)\*}/'], ['(?<$1>\w+)', '(?<$1>\w?)', '(?<$1>\w*)'], $uri);
     }
 
     public function action($request)

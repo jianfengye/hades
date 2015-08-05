@@ -6,8 +6,6 @@ use Hades\Facade\Facade;
 
 class Dao
 {
-    use Facade;
-
     private $config;
 
     public function __construct($config)
@@ -15,29 +13,29 @@ class Dao
         $this->config = $config;
     }
 
-    protected function config()
+    public function config()
     {
         return $this->config;
     }
 
-    protected function builder()
+    public function builder()
     {
         return new Builder($this->config);
     }
 
-    protected function find($id, $columns = [])
+    public function find($id, $columns = [])
     {
         $builder = $this->builder()->where($this->config->pk(), $id)->columns($columns);
         return $builder->get();
     }
 
-    protected function finds(array $ids, $columns = [])
+    public function finds(array $ids, $columns = [])
     {
         $builder = $this->builder()->whereIn($this->config->pk(), $ids)->columns($columns);
         return $builder->gets();
     }
 
-    protected function get(array $wheres, array $orderBy = [], $columns = [])
+    public function get(array $wheres, array $orderBy = [], $columns = [])
     {
         $builder = $this->builder();
         foreach ($wheres as $key => $where) {
@@ -57,7 +55,7 @@ class Dao
         return $builder->get();
     }
 
-    protected function gets(array $wheres = [], array $orderBy = [], $columns = [])
+    public function gets(array $wheres = [], array $orderBy = [], $columns = [])
     {
         $builder = $this->builder();
         foreach ($wheres as $key => $where) {
@@ -77,7 +75,7 @@ class Dao
         return $builder->gets();
     }
 
-    protected function delete(array $wheres = array())
+    public function delete(array $wheres = array())
     {
         $builder = $this->builder()->action('DELETE');
         foreach ($wheres as $key => $where) {
@@ -93,7 +91,7 @@ class Dao
         return $builder->execute();
     }
 
-    protected function num(array $wheres)
+    public function num(array $wheres)
     {
         $builder = $this->builder();
         foreach ($wheres as $key => $where) {

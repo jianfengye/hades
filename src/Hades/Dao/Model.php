@@ -5,8 +5,6 @@ use Hades\Facade\Facade;
 
 class Model
 {
-    use Facade;
-
     private $config;
 
     private $relations = [];
@@ -18,7 +16,7 @@ class Model
             return;
         }
 
-        $alias = self::alias();
+        $alias = get_called_class();
         $binding = \Hades\Container\Container::instance()->getBinding($alias);
         if (empty($binding)) {
             throw new \LogicException("model {$alias} does not contain in container");

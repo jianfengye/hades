@@ -61,7 +61,7 @@ class Logger
         foreach ($files as $filename) {
             $date = str_replace(self::$folder . "/{$name}_" , "", $filename);
             $date = str_replace(".log", "", $date);
-            if (time() - strtotime($date) > self::$rotate *  3600) {
+            if (time() - strtotime($date) > self::$rotate *  3600 * 24) {
                 unlink($filename);
             }
         }

@@ -2,12 +2,8 @@
 
 namespace Hades\Http;
 
-use Hades\Facade\Facade;
-
 class Request
 {
-    use Facade;
-
     // generate from $_GET
     protected $get;
     // generate from $_POST
@@ -32,7 +28,7 @@ class Request
         $this->header = self::getRawHeaders();
     }
 
-    private static function getRawHeaders()
+    public static function getRawHeaders()
     {
         $headers = array();
         foreach($_SERVER as $key => $value) {
@@ -46,13 +42,26 @@ class Request
     }
 
     // set RouteParam
-    protected function setRouteParams($routeParams)
+    public function setRouteParams($routeParams)
     {
         $this->routeParams = $routeParams;
     }
 
+    public function getRouteParams()
+    {
+        return $this->routeParams;
+    }
+
+    public function routeParam($key, $default = null)
+    {
+        if (isset($this->routeParams[$key])) {
+            return $this->routeParams[$key];
+        }
+        return $default;
+    }
+
     // data from routeParams
-    protected function route($key, $default = null)
+    public function route($key, $default = null)
     {
         if (isset($this->routeParams[$key])){
             return $this->routeParams[$key];
@@ -61,7 +70,7 @@ class Request
     }
 
     // data from $_GET
-    protected function get($key, $type = 'string', $default = null)
+    public function get($key, $type = 'string', $default = null)
     {
         $value = $default;
         if (isset($this->get[$key])) {
@@ -72,7 +81,7 @@ class Request
     }
 
     // data from $_POST
-    protected function post($key, $type = 'string', $default = null)
+    public function post($key, $type = 'string', $default = null)
     {
         $value = $default;
         if (isset($this->post[$key])) {
@@ -83,7 +92,7 @@ class Request
     }
 
     // data from $_REQUEST
-    protected function request($key, $type = 'string', $default = null)
+    public function request($key, $type = 'string', $default = null)
     {
         $request = array_merge($this->get, $this->post, $this->cookie, $this->routeParams);
         $value = $default;
@@ -95,7 +104,7 @@ class Request
     }
 
     // data from cookie
-    protected function cookie($key, $default)
+    public function cookie($key, $default)
     {
         if (isset($this->cookie[$key])) {
             return $this->cookie[$key];
@@ -104,7 +113,7 @@ class Request
     }
 
     // get request uri
-    protected function uri()
+    public function uri()
     {
         // in iis and forward proxy, uri in X_ORIGINAL_URL
         if (isset($this->server['X_ORIGINAL_URL']) && !empty($this->server['X_ORIGINAL_URL'])) {
@@ -115,13 +124,13 @@ class Request
     }
 
     // get http request method
-    protected function method()
+    public function httpmethod()
     {
         return strtoupper($this->server['REQUEST_METHOD']);
     }
 
     // create request by create
-    protected function create($method, $params)
+    public function create($method, $params)
     {
         if (strtolower($method) == 'get') {
             $this->get = $params;

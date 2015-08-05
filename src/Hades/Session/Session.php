@@ -3,18 +3,10 @@
 namespace Hades\Session;
 
 use Hades\Config\Config;
-use Hades\Facade\Facade;
 use Hades\Session\Handler\FileHandler;
 
 class Session
 {
-    use Facade;
-
-    public static function getAlias()
-    {
-        return 'Session';
-    }
-
     private $handler;
 
     public function __construct()
@@ -42,12 +34,12 @@ class Session
     }
 
     // check is actived
-    protected function actived()
+    public function actived()
     {
         return boolval(session_status() == PHP_SESSION_ACTIVE);
     }
 
-    protected function get($key, $default = null)
+    public function get($key, $default = null)
     {
         if (isset($_SESSION[$key])) {
             return $_SESSION[$key];
@@ -55,22 +47,22 @@ class Session
         return $default;
     }
 
-    protected function set($key, $value)
+    public function set($key, $value)
     {
         $_SESSION[$key] = $value;
     }
 
-    protected function all()
+    public function all()
     {
         return $_SESSION;
     }
 
-    protected function del($key)
+    public function del($key)
     {
         unset($_SESSION[$key]);
     }
 
-    protected function has($key)
+    public function has($key)
     {
         return isset($_SESSION[$key]);
     }

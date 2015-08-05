@@ -4,9 +4,6 @@ use Hades\Facade\Facade;
 use Hades\Container\Container;
 
 class ContainerFacade {
-    use Facade;
-
-    public static function alias() { return 'ContanerContract'; }
 
     public function bar1()
     {
@@ -42,7 +39,9 @@ class ContainerTest extends \Hades\Test\TestCase
 
         $this->assertEquals('public bar', $foo->bar1());
 
-        $this->assertEquals('private bar', \ContanerContract::bar2());
+        //$this->assertEquals('private bar', $foo->bar2());
+
+        $this->assertEquals('public bar', \ContanerContract::bar1());
 
         $this->assertEquals('public static bar', \ContanerContract::bar3());
 

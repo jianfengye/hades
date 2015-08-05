@@ -58,6 +58,10 @@ class Container
             'class' => $class,
             'args' => $args
         ];
+
+        if (!class_exists($contract, false)) {
+            eval("class {$contract} extends \Hades\Container\Facade {} ");
+        }
     }
 
     // bind a class
@@ -70,8 +74,13 @@ class Container
         $this->bindings[$contract] = [
             'type' => 'singleton',
             'instance' => $instance,
+            'class' => $class,
             'args' => $args
         ];
+
+        if (!class_exists($contract, false)) {
+            eval("class {$contract} extends \Hades\Container\Facade {} ");
+        }
     }
 
     // make some contract
@@ -97,18 +106,11 @@ class Container
         return isset($this->bindings[$contract]);
     }
 
-    public function getBinding($contract) {
+    public function getBinding($contract)
+    {
         if ($this->have($contract)) {
             return $this->bindings[$contract];
         }
         return null;
     }
-
-    public function alias($contract)
-    {
-        $this->last_alias = $contract;
-        $class = $this->bindings[$contract]['class'];
-        class_alias($class, $contract);
-    }
-
 }

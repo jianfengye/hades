@@ -20,18 +20,23 @@ class Register
                 $alias_model = $config['model'];
             }
 
+
             if (!class_exists($model_name, false)) {
                 eval("class {$model_name} extends {$alias_model} {} ");
             }
-            $container->bind($model_name, "\\{$model_name}", [$configConstr]);
+
+            $container->bind($model_name, $alias_model, [$configConstr]);
 
             $dao_name = self::daoName($table);
             $alias_dao = '\Hades\Dao\Dao';
 
+            /*
             if (!class_exists($dao_name, false)) {
                 eval("class {$dao_name} extends {$alias_dao} {} ");
             }
-            $container->bind($dao_name, "\\{$dao_name}", [$configConstr]);
+            */
+
+            $container->bind($dao_name, $alias_dao, [$configConstr]);
         }
     }
 

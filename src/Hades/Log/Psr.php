@@ -23,7 +23,7 @@ class Psr
     public function log($level, $message, array $context = array())
     {
         $line = date("Y-m-d H:i:s") . " {$level}:{$message}\r\n" . var_export($context, true) . "\r\n";
-        $stream = fopen($this->file, 'c');
+        $stream = fopen($this->file, 'a');
         fwrite($stream, $line);
         fclose($stream);
     }

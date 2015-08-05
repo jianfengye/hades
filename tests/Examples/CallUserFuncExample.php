@@ -1,5 +1,5 @@
 <?php
-
+/*
 class Foo
 {
     public function Bar()
@@ -25,3 +25,29 @@ class Foo
 
 $foo = new Foo();
 Foo::Bar2();
+*/
+
+class Foo2
+{
+    public function Bar()
+    {
+        echo 'Bar';
+    }
+
+    private function Bar2()
+    {
+        echo 'Bar2';
+    }
+}
+
+class Foo2Helper
+{
+    public function __call($method, $args)
+    {
+        $instance = new Foo2();
+        return call_user_func_array(array($instance, $method), $args);
+    }
+}
+
+$helper = new Foo2Helper();
+$helper->Bar2();
