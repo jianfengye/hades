@@ -24,7 +24,8 @@ class ExceptionHandler
 
     public function render()
     {
-        Logger::instance()->error($this->exception->getMessage(), $this->exception->getTrace());
+        // TODO: 优化这里的错误格式
+        Logger::instance()->error($this->exception->getMessage(), []);
 
         if (php_sapi_name() == 'cli') {
             return $this->renderConsole();

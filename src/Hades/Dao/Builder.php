@@ -131,6 +131,7 @@ class Builder
     public function get()
     {
         list($sql, $values) = $this->prepare();
+        \Hades\Log\Logger::instance('query')->info('Builder::get',[compact('sql', 'value')]);
         $stm = $this->connection()->pdo()->prepare($sql);
         $stm->execute($values);
         return $stm->fetchObject(Register::modelName($this->config->table()), [$this->config]);
@@ -139,6 +140,7 @@ class Builder
     public function gets()
     {
         list($sql, $values) = $this->prepare();
+        \Hades\Log\Logger::instance('query')->info('Builder::gets', [compact('sql', 'value')]);
         $stm = $this->connection()->pdo()->prepare($sql);
         $stm->setFetchMode(\PDO::FETCH_CLASS, Register::modelName($this->config->table()), [$this->config]);
         $stm->execute($values);
@@ -161,6 +163,7 @@ class Builder
     public function execute()
     {
         list($sql, $values) = $this->prepare();
+        \Hades\Log\Logger::instance('query')->info('Builder::execute', [compact('sql', 'value')]);
         $stm = $this->connection()->pdo()->prepare($sql);
         $stm->execute($values);
     }
@@ -211,7 +214,8 @@ class Builder
         if ($this->sets) {
             $sql .= " SET ";
             foreach ($this->sets as $key => $value) {
-                $sql .= " {$key} = {$value},";
+                $sql .= " {$key} = ?,";
+                $values = array_merge($values, [$value]);
             }
             $sql = trim($sql, ',');
         }

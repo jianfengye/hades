@@ -75,6 +75,9 @@ class Model
 
         $builder = $this->builder()->master()->action('UPDATE');
         foreach ($fields as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
             if ($key != $pk) {
                 $builder->set($key, $value);
             }
