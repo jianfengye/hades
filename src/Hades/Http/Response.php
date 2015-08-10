@@ -20,6 +20,8 @@ class Response
     // data
     private $data;
 
+    public static $share = [];
+
     public $statusTexts = array(
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -159,5 +161,10 @@ class Response
     {
         $this->data = $data;
         return $this;
+    }
+
+    public static function share(array $share)
+    {
+        self::$share = array_merge(self::$share, $share);
     }
 }

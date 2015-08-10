@@ -13,7 +13,7 @@ class FileHandler implements \SessionHandlerInterface
 
     public function destroy($session_id)
     {
-        $file = "$this->savePath/sess_$session_id";
+        $file = "{$this->savePath}/sess_{$session_id}";
         if (file_exists($file)) {
             unlink($file);
         }

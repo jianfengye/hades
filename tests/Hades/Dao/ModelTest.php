@@ -69,7 +69,7 @@ class ModelTest extends \Hades\Test\TestCase
         $testModel->field1 = 1;
         $testModel->field2 = 2;
         $testModel->save();
-
+        
         $this->assertEquals(1, $testModel->id);
 
         $testModel->field2 = 3;

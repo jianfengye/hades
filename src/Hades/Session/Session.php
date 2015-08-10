@@ -16,9 +16,14 @@ class Session
         }
 
         // set handler by config
-        $driver = Config::get('session.driver');
-        if (empty($driver)) {
-            return;
+        $driver = 'file';
+        if (Config::get('session.driver')) {
+            $driver = Config::get('session.driver');
+        }
+
+        $lifetime = 60;
+        if (Config::has('session.lifetime')) {
+            $lifetime = Config::get('session.lifetime');
         }
 
         $this->handler = new FileHandler();
@@ -30,6 +35,7 @@ class Session
         }
 
         session_set_save_handler($this->handler);
+        session_set_cookie_params($lifetime);
         session_start();
     }
 

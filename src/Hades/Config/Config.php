@@ -36,4 +36,30 @@ Class Config
         }
         return $value;
     }
+
+    public static function has($paths, $default = null)
+    {
+        $paths = explode('.', $paths);
+
+        $file = self::$folder . "/" . $paths[0] . ".php";
+        if (!file_exists($file)) {
+            return false;
+        }
+
+        $config = require $file;
+
+        $value = $config;
+        foreach ($paths as $key => $path) {
+            if ($key == 0) {
+                continue;
+            }
+
+            if (isset($value[$path])) {
+                $value = $value[$path];
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
 }

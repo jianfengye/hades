@@ -11,7 +11,8 @@
          syntaxCheck="false">
     <testsuites>
         <testsuite name="Hade Test Suite">
-            <directory>/vagrant/develop/vendor/hades/framework/tests/</directory>
+            <!--<directory>/vagrant/develop/vendor/hades/framework/tests/</directory>-->
+            <file>/vagrant/develop/vendor/hades/framework/tests/Hades/Dao/ModelTest.php</file>
         </testsuite>
     </testsuites>
     <php>

@@ -47,18 +47,22 @@ class Model
     {
         $fields = call_user_func('get_object_vars', $this);
         $builder = $this->builder()->master()->action('INSERT');
+
+        $pk = $this->config()->pk();
         foreach ($fields as $key => $value) {
+            // if there is pk, must be empty, else omit
+            if (($key == $pk) && empty($value)) {
+                continue;
+            }
             $builder->set($key, $value);
         }
 
-        $pk = $this->config->pk();
         if ($builder->connection()->driver() == 'pgsql') {
             $builder->returning([$pk]);
             $obj = $builder->get();
             $this->$pk = $obj->$pk;
             return $this;
         }
-
         $builder->execute();
         $this->$pk = $builder->lastInsertId();
         return $this;
