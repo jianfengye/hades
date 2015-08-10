@@ -6,9 +6,18 @@ Class Config
 {
     private static $folder = '';
 
+    private static $local = [];
+
     public static function setFolder($folder)
     {
         self::$folder = $folder;
+    }
+
+    // load env.php
+    public static function local($local)
+    {
+        $local = require $local;
+        self::$local = $local;
     }
 
     public static function get($paths, $default = null)
@@ -21,6 +30,9 @@ Class Config
         }
 
         $config = require $file;
+        if (isset(self::$local[$paths[0]])) {
+            $config = array_replace_recursive($config, self::$local[$paths[0]]);
+        }
 
         $value = $config;
         foreach ($paths as $key => $path) {
