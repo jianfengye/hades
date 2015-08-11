@@ -34,7 +34,8 @@ class Session
                 break;
         }
 
-        session_set_save_handler($this->handler);
+        session_name('hades_session');
+        session_set_save_handler($this->handler, true);
         session_set_cookie_params($lifetime);
         session_start();
     }
@@ -55,6 +56,7 @@ class Session
 
     public function set($key, $value)
     {
+        \Hades\Log\Logger::instance('session')->info('set file ', compact('key', 'value'));
         $_SESSION[$key] = $value;
     }
 

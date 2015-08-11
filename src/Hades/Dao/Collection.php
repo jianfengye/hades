@@ -71,4 +71,13 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable, JsonSeria
     {
         return new ArrayIterator($this->models);
     }
+
+    public function lists($field)
+    {
+        $ret = [];
+        foreach($this as $item) {
+            $ret[] = $item->$field;
+        }
+        return $ret;
+    }
 }
