@@ -20,7 +20,7 @@ class Manager
                 return $route->action($request);
             }
         }
-        throw new NotFoundRouteException();
+        throw new \LogicException("Not Found Route");
     }
 
     // set get route

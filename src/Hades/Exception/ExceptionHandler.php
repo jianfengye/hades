@@ -12,20 +12,18 @@ class ExceptionHandler
         $this->exception = $exception;
     }
 
-    public function renderHttp()
-    {
+    protected function renderHttp() {}
 
-    }
-
-    public function renderConsole()
-    {
-
-    }
+    protected function renderConsole() {}
 
     public function render()
     {
-        // TODO: 优化这里的错误格式
-        Logger::instance()->error($this->exception->getMessage(), []);
+        $log = [
+            "File" => $this->exception->getFile(),
+            "Line" => $this->exception->getLine(),
+            "Trace" => PHP_EOL . $this->exception->getTraceAsString(),
+        ];
+        Logger::instance()->error($this->exception->getMessage(), $log);
 
         if (php_sapi_name() == 'cli') {
             return $this->renderConsole();
