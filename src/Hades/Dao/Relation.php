@@ -19,6 +19,11 @@ class Relation
         $builder = new Builder(new Config($table, $config));
         $key = $relation['key'];
         $relate_key = $relation['relate_key'];
+        if (isset( $relation['builder'] )) {
+            foreach ($relation['builder'] as $func => $params) {
+                $builder = call_user_func_array([$builder, $func], $params);
+            }
+        }
         switch ($type) {
             case 'has_many':
                 $builder->where($relate_key, $model->$key);
@@ -58,6 +63,12 @@ class Relation
         $keys = [];
         foreach ($collection as $model) {
             $keys[] = $model->$key;
+        }
+
+        if (isset( $relation['builder'] )) {
+            foreach ($relation['builder'] as $func => $params) {
+                $builder = call_user_func_array([$builder, $func], $params);
+            }
         }
 
         switch ($type) {
