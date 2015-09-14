@@ -75,6 +75,7 @@ Hades是一款容易上手的PHP框架，它在很大程度上借鉴了laravel�
 提供Dao和Model使用：
 
 增加数据：
+
     $log = new \LogModel();
     $log->project_id = $project_id;
     $log->admin_id = $myself->id;
@@ -106,7 +107,7 @@ Hades是一款容易上手的PHP框架，它在很大程度上借鉴了laravel�
 
 ## 目录结构
 
-参考(hades_install)[https://github.com/jianfengye/hades_install]
+参考[hades_install](https://github.com/jianfengye/hades_install)
 
 ### License
 
